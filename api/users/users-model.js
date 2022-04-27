@@ -4,7 +4,6 @@ function find() {
   /**
     You will need to join two tables.
     Resolves to an ARRAY with all users.
-
     [
       {
         "user_id": 1,
@@ -17,14 +16,24 @@ function find() {
         "role_name": "instructor"
       }
     ]
+    SELECT
+      user_id,
+      username,
+    role_name
+    FROM users
+      JOIN roles ON users.role_id = roles.role_id
    */
+  return db('users')
+    .join('roles', 'users.role_id', 'roles.role_id')
+    .select('user_id', 'username', 'role_name')
 }
+
+
 
 function findBy(filter) {
   /**
     You will need to join two tables.
     Resolves to an ARRAY with all users that match the filter condition.
-
     [
       {
         "user_id": 1,
@@ -34,33 +43,37 @@ function findBy(filter) {
       }
     ]
    */
+    return db('users')
+    .join('roles', 'users.role_id', 'roles.role_id')
+    .select('user_id', 'username', 'password', 'role_name')
+    .where(filter)
 }
 
 function findById(user_id) {
   /**
     You will need to join two tables.
     Resolves to the user with the given user_id.
-
     {
       "user_id": 2,
       "username": "sue",
       "role_name": "instructor"
     }
    */
+    return db('users')
+    .join('roles', 'users.role_id', 'roles.role_id')
+    .select('user_id', 'username', 'role_name')
+    .where('users.user_id', user_id).first()
 }
 
 /**
   Creating a user requires a single insert (into users) if the role record with the given
   role_name already exists in the db, or two inserts (into roles and then into users)
   if the given role_name does not exist yet.
-
   When an operation like creating a user involves inserts to several tables,
   we want the operation to succeed or fail as a whole. It would not do to
   insert a new role record and then have the insertion of the user fail.
-
   In situations like these we use transactions: if anything inside the transaction
   fails, all the database changes in it are rolled back.
-
   {
     "user_id": 7,
     "username": "anna",
